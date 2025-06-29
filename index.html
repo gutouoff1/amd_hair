@@ -1,0 +1,166 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>舒缓按摩店</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2em;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            background-color: #34495e;
+            padding: 1em;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1em;
+            font-size: 1.2em;
+        }
+        nav a:hover {
+            color: #3498db;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2em;
+        }
+        .section {
+            margin-bottom: 2em;
+        }
+        .section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5em;
+        }
+        .services {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .service-item {
+            background-color: white;
+            padding: 1em;
+            margin: 1em;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 30%;
+            text-align: center;
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .service-item {
+                width: 100%;
+                margin: 1em 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>舒缓按摩店</h1>
+        <p>放松身心，享受健康生活</p>
+    </header>
+    <nav>
+        <a href="#home">首页</a>
+        <a href="#services">服务项目</a>
+        <a href="#contact">联系我们</a>
+    </nav>
+    <div class="container">
+        <div id="home" class="section">
+            <h2>欢迎光临</h2>
+            <p>舒缓按摩店致力于为您提供专业的按摩服务，缓解您的压力，提升您的健康与幸福感。我们拥有经验丰富的按摩师和舒适的环境，欢迎体验！</p>
+        </div>
+        <div id="services" class="section">
+            <h2>服务项目</h2>
+            <div class="services">
+                <div class="service-item">
+                    <h3>全身按摩</h3>
+                    <p>60分钟的放松体验，缓解肌肉紧张，促进血液循环。</p>
+                </div>
+                <div class="service-item">
+                    <h3>足部按摩</h3>
+                    <p>45分钟的足部护理，舒缓疲劳，焕发活力。</p>
+                </div>
+                <div class="service-item">
+                    <h3>精油按摩</h3>
+                    <p>使用天然精油，90分钟的深度放松，舒缓身心。</p>
+                </div>
+            </div>
+        </div>
+        <div id="contact" class="section">
+            <h2>联系我们</h2>
+            <p>电话: 123-456-7890</p>
+            <p>地址: 某某市某某路123号</p>
+            <p>营业时间: 周一至周日 10:00 - 22:00</p>
+            <p>Email: contact@shuhuanmassage.com</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 舒缓按摩店. 保留所有权利。</p>
+    </footer>
+</body>
+</html>
